@@ -2,13 +2,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const users = require('./routes/users');
+const cards = require('./routes/card');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
-// eslint-disable-next-line no-console
 }).catch((error) => console.log(error));
 
 app.use(bodyParser.json());
@@ -21,6 +21,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/users', users);
+app.use('/cards', cards);
 
 app.listen(PORT, () => {
 

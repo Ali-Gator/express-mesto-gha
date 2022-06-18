@@ -12,7 +12,7 @@ module.exports.getUserById = (req, res) => {
     .catch((err) => console.log(err));
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.postUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
