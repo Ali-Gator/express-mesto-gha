@@ -19,3 +19,37 @@ module.exports.postUser = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
+
+module.exports.patchProfile = (req, res) => {
+  const { name, about } = req.body;
+  const userId = req.user._id;
+
+  User.findOneAndUpdate(
+    userId,
+    { name, about },
+    {
+      new: true,
+      runValidators: true,
+      upsert: true,
+    },
+  )
+    .then((user) => res.status(200).send(user))
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
+
+module.exports.patchAvatar = (req, res) => {
+  const { avatar } = req.body;
+  const userId = req.user._id;
+
+  User.findOneAndUpdate(
+    userId,
+    { avatar },
+    {
+      new: true,
+      runValidators: true,
+      upsert: true,
+    },
+  )
+    .then((user) => res.status(200).send(user))
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
