@@ -12,17 +12,25 @@ const cardSchema = mongoose.Schema({
     required: true,
   },
   owner: {
-    type: mongoose.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
     required: true,
   },
   likes: [{
-    type: mongoose.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
     default: [],
   }],
   createdAt: {
     type: Date,
     default: Date.now(),
   },
+});
+
+cardSchema.post('save', (doc, next) => {
+  doc.populate(['owner', 'likes']).then(() => {
+    next();
+  });
 });
 
 module.exports = mongoose.model('card', cardSchema);

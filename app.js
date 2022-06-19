@@ -3,9 +3,14 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const users = require('./routes/users');
 const cards = require('./routes/card');
+const { DEFAULT_PORT } = require('./utils/constants');
 
-const { PORT = 3000 } = process.env;
+const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
+
+process.on('uncaughtException', (err, origin) => {
+  console.log(`${origin} ${err.name} with text ${err.message} doesn't catch. Look at this!`);
+});
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
