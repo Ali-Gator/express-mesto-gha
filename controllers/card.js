@@ -32,11 +32,15 @@ module.exports.postCard = async (req, res) => {
 
 module.exports.deleteCard = async (req, res) => {
   try {
-    await Card.findByIdAndRemove(req.params.cardId);
-    res.status(200).send({ message: 'Post successfully deleted' });
+    const card = await Card.findByIdAndRemove(req.params.cardId);
+    if (card) {
+      res.status(200).send({ message: 'Post successfully deleted' });
+    } else {
+      res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+    }
   } catch (err) {
     if (err.name === 'CastError') {
-      return res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+      res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
     }
     res.status(INTERNAL_SERVER_ERROR).send({ INTERNAL_SERVER_MESSAGE });
   }
@@ -49,10 +53,14 @@ module.exports.putLike = async (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true },
     ).populate(['owner', 'likes']);
-    res.status(200).send(card);
+    if (card) {
+      res.status(200).send(card);
+    } else {
+      res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+    }
   } catch (err) {
     if (err.name === 'CastError') {
-      return res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+      return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
     }
     res.status(INTERNAL_SERVER_ERROR).send({ message: INTERNAL_SERVER_MESSAGE });
   }
@@ -65,10 +73,14 @@ module.exports.deleteLike = async (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true },
     ).populate(['owner', 'likes']);
-    res.status(200).send(card);
+    if (card) {
+      res.status(200).send(card);
+    } else {
+      res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+    }
   } catch (err) {
     if (err.name === 'CastError') {
-      return res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+      return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
     }
     res.status(INTERNAL_SERVER_ERROR).send({ message: INTERNAL_SERVER_MESSAGE });
   }

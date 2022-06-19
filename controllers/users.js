@@ -18,10 +18,14 @@ module.exports.getUsers = async (req, res) => {
 module.exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
-    res.status(200).send(user);
+    if (user) {
+      res.status(200).send(user);
+    } else {
+      res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+    }
   } catch (err) {
     if (err.name === 'CastError') {
-      return res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+      return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
     }
     res.status(INTERNAL_SERVER_ERROR).send({ INTERNAL_SERVER_MESSAGE });
   }
@@ -60,23 +64,35 @@ module.exports.patchProfile = async (req, res) => {
     if (err.name === 'CastError') {
       return res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
     }
+    if (err.name === 'ValidationError') {
+      return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
+    }
     res.status(INTERNAL_SERVER_ERROR).send({ INTERNAL_SERVER_MESSAGE });
   }
 };
 
-module.exports.patchAvatar = (req, res) => {
-  const { avatar } = req.body;
-  const userId = req.user._id;
+module.exports.patchAvatar = async (req, res) => {
+  try {
+    const { avatar } = req.body;
+    const userId = req.user._id;
 
-  User.findOneAndUpdate(
-    userId,
-    { avatar },
-    {
-      new: true,
-      runValidators: true,
-      upsert: true,
-    },
-  )
-    .then((user) => res.status(200).send(user))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    const user = await User.findOneAndUpdate(
+      userId,
+      { avatar },
+      {
+        new: true,
+        runValidators: true,
+        upsert: true,
+      },
+    );
+    res.status(200).send(user);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+    }
+    if (err.name === 'ValidationError') {
+      return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
+    }
+    res.status(INTERNAL_SERVER_ERROR).send({ INTERNAL_SERVER_MESSAGE });
+  }
 };

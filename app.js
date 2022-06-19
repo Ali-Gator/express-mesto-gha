@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const users = require('./routes/users');
 const cards = require('./routes/card');
-const { DEFAULT_PORT } = require('./utils/constants');
+const { DEFAULT_PORT, NOT_FOUND_ERR, NOT_FOUND_MESSAGE } = require('./utils/constants');
 
 const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
@@ -27,6 +27,9 @@ app.use((req, res, next) => {
 
 app.use('/users', users);
 app.use('/cards', cards);
+app.all('*', (req, res) => {
+  res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+});
 
 app.listen(PORT, () => {
 
