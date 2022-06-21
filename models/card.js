@@ -4,17 +4,17 @@ const cardSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
-    minLength: 2,
-    maxLength: 30,
+    minLength: [2, 'Too short length of name'],
+    maxLength: [30, 'Too long length of name'],
   },
   link: {
     type: String,
-    required: true,
+    required: [true, 'Link required'],
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: true,
+    required: [true, 'Owner required'],
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,

@@ -27,7 +27,8 @@ app.use((req, res, next) => {
 
 app.use('/users', users);
 app.use('/cards', cards);
-app.all('*', (req, res) => {
+
+app.use((req, res) => {
   res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
 });
 
