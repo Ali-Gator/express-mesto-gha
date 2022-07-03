@@ -9,7 +9,7 @@ const {
 module.exports.getCards = async (req, res) => {
   try {
     const cards = await Card.find({}).populate(['owner', 'likes']);
-    res.status(200).send(cards);
+    res.send(cards);
   } catch (err) {
     res.status(INTERNAL_SERVER_ERROR).send({ message: INTERNAL_SERVER_MESSAGE });
   }
@@ -21,7 +21,7 @@ module.exports.postCard = async (req, res) => {
     const owner = req.user._id;
 
     const card = await Card.create({ name, link, owner });
-    res.status(200).send(card);
+    res.send(card);
   } catch (err) {
     if (err.name === 'ValidationError') {
       return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
@@ -34,7 +34,7 @@ module.exports.deleteCard = async (req, res) => {
   try {
     const card = await Card.findByIdAndRemove(req.params.cardId);
     if (card) {
-      res.status(200).send({ message: 'Post successfully deleted' });
+      res.send({ message: 'Post successfully deleted' });
     } else {
       res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
     }
@@ -42,7 +42,7 @@ module.exports.deleteCard = async (req, res) => {
     if (err.name === 'CastError') {
       res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
     }
-    res.status(INTERNAL_SERVER_ERROR).send({ INTERNAL_SERVER_MESSAGE });
+    res.status(INTERNAL_SERVER_ERROR).send({ message: INTERNAL_SERVER_MESSAGE });
   }
 };
 
@@ -54,7 +54,7 @@ module.exports.putLike = async (req, res) => {
       { new: true },
     ).populate(['owner', 'likes']);
     if (card) {
-      res.status(200).send(card);
+      res.send(card);
     } else {
       res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
     }
@@ -74,7 +74,7 @@ module.exports.deleteLike = async (req, res) => {
       { new: true },
     ).populate(['owner', 'likes']);
     if (card) {
-      res.status(200).send(card);
+      res.send(card);
     } else {
       res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
     }

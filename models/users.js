@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const { UNAUTHORIZED_MESSAGE } = require('../utils/constants');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -36,5 +38,17 @@ const userSchema = new mongoose.Schema({
     minlength: 8,
   },
 });
+
+userSchema.statics.findUserByCredentials = async function findUserByCredentials(email, password) {
+  const user = await this.findOne({ email });
+  if (!user) {
+    throw new Error(UNAUTHORIZED_MESSAGE);
+  }
+  const isMatched = bcrypt.compare(password, user.password);
+  if (!isMatched) {
+    throw new Error(UNAUTHORIZED_MESSAGE);
+  }
+  return user;
+};
 
 module.exports = mongoose.model('user', userSchema);
