@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "lint": "npx eslint .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "npx eslint ."
   },
   "repository": {
     "type": "git",
@@ -18,7 +17,7 @@
   "bugs": {
     "url": "https://github.com/Ali-Gator/express-mesto-gha/issues"
   },
-  "homepage": "https://github.com/Ali-Gator/express-mesto-gha#readme",
+  "homepage": "https://github.com/Ali-Gator/express-mesto-gha",
   "devDependencies": {
     "eslint": "^8.17.0",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -28,6 +27,7 @@
   "dependencies": {
     "body-parser": "^1.20.0",
     "express": "^4.18.1",
-    "mongoose": "^6.3.8"
+    "mongoose": "^6.3.8",
+    "validator": "^13.7.0"
   }
 }

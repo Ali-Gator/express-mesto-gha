@@ -33,9 +33,13 @@ module.exports.getUserById = async (req, res) => {
 
 module.exports.postUser = async (req, res) => {
   try {
-    const { name, about, avatar } = req.body;
+    const {
+      name, about, avatar, email, password,
+    } = req.body;
 
-    const user = await User.create({ name, about, avatar });
+    const user = await User.create({
+      name, about, avatar, email, password,
+    });
     res.status(200).send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
