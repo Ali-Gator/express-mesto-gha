@@ -1,9 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const users = require('./routes/users');
-const cards = require('./routes/card');
 const { DEFAULT_PORT, NOT_FOUND_ERR, NOT_FOUND_MESSAGE } = require('./utils/constants');
+const users = require('./routes/users');
+const { login, createUser } = require('./models/users');
+const cards = require('./routes/card');
 
 const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
@@ -25,6 +27,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use('/users', users);
 app.use('/cards', cards);
 app.all('*', (req, res) => {

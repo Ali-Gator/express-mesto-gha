@@ -2,11 +2,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 const {
   INTERNAL_SERVER_ERROR,
   INTERNAL_SERVER_MESSAGE,
   NOT_FOUND_ERR,
-  NOT_FOUND_MESSAGE, BAD_REQUEST_ERROR, BAD_REQUEST_MESSAGE, UNAUTHORIZED_ERR, UNAUTHORIZED_MESSAGE, SECRET_KEY,
+  NOT_FOUND_MESSAGE, BAD_REQUEST_ERROR, BAD_REQUEST_MESSAGE,
 } = require('../utils/constants');
 
 module.exports.getUsers = async (req, res) => {
@@ -34,7 +36,7 @@ module.exports.getUserById = async (req, res) => {
   }
 };
 
-module.exports.postUser = async (req, res) => {
+module.exports.createUser = async (req, res) => {
   try {
     const {
       name, about, avatar, email, password,
@@ -108,7 +110,11 @@ module.exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findUserByCredentials(email, password);
-    const token = jwt.sign({ _id: user._id }, SECRET_KEY, { expiresIn: '7d' });
+    const token = jwt.sign(
+      { _id: user._id },
+      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+      { expiresIn: '7d' },
+    );
     res.cookie('jwt', token, {
       maxAge: 3600000 * 24 * 7,
       httpOnly: true,
