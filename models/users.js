@@ -41,7 +41,6 @@ const userSchema = new mongoose.Schema({
 
 userSchema.statics.findUserByCredentials = async function findUserByCredentials(email, password) {
   const user = await this.findOne({ email });
-  console.log('email', email);
   if (!user) {
     throw new Error(UNAUTHORIZED_MESSAGE);
   }

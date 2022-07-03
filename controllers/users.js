@@ -8,7 +8,7 @@ const {
   INTERNAL_SERVER_ERROR,
   INTERNAL_SERVER_MESSAGE,
   NOT_FOUND_ERR,
-  NOT_FOUND_MESSAGE, BAD_REQUEST_ERROR, BAD_REQUEST_MESSAGE,
+  NOT_FOUND_MESSAGE, BAD_REQUEST_ERROR, BAD_REQUEST_MESSAGE, UNAUTHORIZED_ERR, UNAUTHORIZED_MESSAGE,
 } = require('../utils/constants');
 
 module.exports.getUsers = async (req, res) => {
@@ -23,6 +23,22 @@ module.exports.getUsers = async (req, res) => {
 module.exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
+    if (user) {
+      res.send(user);
+    } else {
+      res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+    }
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
+    }
+    res.status(INTERNAL_SERVER_ERROR).send({ message: INTERNAL_SERVER_MESSAGE });
+  }
+};
+
+module.exports.getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
     if (user) {
       res.send(user);
     } else {
@@ -119,10 +135,10 @@ module.exports.login = async (req, res) => {
     res.cookie('jwt', token, {
       maxAge: 3600000 * 24 * 7,
       httpOnly: true,
-      sameSite: true,
+      // sameSite: true,
     });
     res.send('ok');
   } catch (err) {
-    console.log(err);
+    res.status(UNAUTHORIZED_ERR).send({ message: UNAUTHORIZED_MESSAGE });
   }
 };

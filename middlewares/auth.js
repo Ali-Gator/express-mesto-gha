@@ -4,11 +4,10 @@ const { UNAUTHORIZED_MESSAGE } = require('../utils/constants');
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports = (req, res, next) => {
-  const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  const token = req.cookies.jwt;
+  if (!token) {
     throw new Error(UNAUTHORIZED_MESSAGE);
   }
-  const token = authorization.replace('Bearer ', '');
   try {
     req.user = jwt.verify(
       token,
