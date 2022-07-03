@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const { DEFAULT_PORT, NOT_FOUND_ERR, NOT_FOUND_MESSAGE } = require('./utils/constants');
 const users = require('./routes/users');
-const { login, createUser } = require('./models/users');
+const { login, createUser } = require('./controllers/users');
 const cards = require('./routes/card');
 
 const { PORT = DEFAULT_PORT } = process.env;

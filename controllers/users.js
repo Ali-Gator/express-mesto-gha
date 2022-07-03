@@ -41,6 +41,7 @@ module.exports.createUser = async (req, res) => {
     const {
       name, about, avatar, email, password,
     } = req.body;
+    // todo check password length
     const passwordHashed = await bcrypt.hash(password, 10);
     const user = await User.create({
       name, about, avatar, email, password: passwordHashed,
@@ -120,6 +121,7 @@ module.exports.login = async (req, res) => {
       httpOnly: true,
       sameSite: true,
     });
+    res.send('ok');
   } catch (err) {
     console.log(err);
   }
