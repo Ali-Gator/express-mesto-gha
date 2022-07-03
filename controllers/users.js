@@ -1,4 +1,6 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/users');
+
 const {
   INTERNAL_SERVER_ERROR,
   INTERNAL_SERVER_MESSAGE,
@@ -36,9 +38,9 @@ module.exports.postUser = async (req, res) => {
     const {
       name, about, avatar, email, password,
     } = req.body;
-
+    const passwordHashed = await bcrypt.hash(password, 10);
     const user = await User.create({
-      name, about, avatar, email, password,
+      name, about, avatar, email, password: passwordHashed,
     });
     res.status(200).send(user);
   } catch (err) {
