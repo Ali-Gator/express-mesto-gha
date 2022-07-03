@@ -57,10 +57,7 @@ module.exports.createUser = async (req, res) => {
     const {
       name, about, avatar, email, password,
     } = req.body;
-    console.log(req.body);
-    // todo check password length
     const passwordHashed = await bcrypt.hash(password, 10);
-    console.log(passwordHashed);
     const user = await User.create({
       name, about, avatar, email, password: passwordHashed,
     });
@@ -69,6 +66,9 @@ module.exports.createUser = async (req, res) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
+    }
+    if (err.code === 11000) {
+      return res.status(409).send({ message: 'acdsv' });
     }
     res.status(INTERNAL_SERVER_ERROR).send({ message: INTERNAL_SERVER_MESSAGE });
   }
