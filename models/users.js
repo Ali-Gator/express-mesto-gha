@@ -44,7 +44,7 @@ userSchema.statics.findUserByCredentials = async function findUserByCredentials(
   if (!user) {
     throw new Error(UNAUTHORIZED_MESSAGE);
   }
-  const isMatched = bcrypt.compare(password, user.password);
+  const isMatched = await bcrypt.compare(password, user.password);
   if (!isMatched) {
     throw new Error(UNAUTHORIZED_MESSAGE);
   }

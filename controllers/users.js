@@ -57,11 +57,14 @@ module.exports.createUser = async (req, res) => {
     const {
       name, about, avatar, email, password,
     } = req.body;
+    console.log(req.body);
     // todo check password length
     const passwordHashed = await bcrypt.hash(password, 10);
+    console.log(passwordHashed);
     const user = await User.create({
       name, about, avatar, email, password: passwordHashed,
     });
+    console.log(user);
     res.send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
@@ -135,7 +138,7 @@ module.exports.login = async (req, res) => {
     res.cookie('jwt', token, {
       maxAge: 3600000 * 24 * 7,
       httpOnly: true,
-      // sameSite: true,
+      sameSite: true,
     });
     res.send('ok');
   } catch (err) {

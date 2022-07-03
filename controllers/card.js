@@ -32,12 +32,15 @@ module.exports.postCard = async (req, res) => {
 
 module.exports.deleteCard = async (req, res) => {
   try {
-    const card = await Card.findByIdAndRemove(req.params.cardId);
-    if (card) {
-      res.send({ message: 'Post successfully deleted' });
-    } else {
-      res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+    const card = await Card.findById(req.params.cardId).populate('owner');
+    if (!card) {
+      throw new Error(NOT_FOUND_MESSAGE);
     }
+    if (card.owner._id.toString() !== req.user._id) {
+      throw new Error('You can delete ONLY yours cards');
+    }
+    await Card.findByIdAndRemove(req.params.cardId);
+    res.send({ message: 'Post successfully deleted' });
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
