@@ -8,7 +8,8 @@ router.get('/', getCards);
 router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().uri().required(),
+    // eslint-disable-next-line no-useless-escape
+    link: Joi.string().pattern(/^https?:\/\/[www\.]?[\dA-Za-z\-\._~:\/\?#\[\]@!\$&'\(\)\*\+,;=]+/i).required(),
   }),
 }), postCard);
 router.delete('/:cardId', celebrate({
