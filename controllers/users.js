@@ -17,9 +17,9 @@ module.exports.getUsers = async (req, res, next) => {
   }
 };
 
-module.exports.getUserById = async (req, res, next) => {
+module.exports.getCurrentUser = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.user._id);
     if (!user) throw new NotFoundError(NOT_FOUND_MESSAGE);
     res.send(user);
   } catch (err) {
@@ -27,9 +27,9 @@ module.exports.getUserById = async (req, res, next) => {
   }
 };
 
-module.exports.getCurrentUser = async (req, res, next) => {
+module.exports.getUserById = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.params.userId);
     if (!user) throw new NotFoundError(NOT_FOUND_MESSAGE);
     res.send(user);
   } catch (err) {
