@@ -47,7 +47,9 @@ module.exports.createUser = async (req, res, next) => {
       name, about, avatar, email, password: passwordHashed,
     });
     if (!user) throw new BadRequestError(BAD_REQUEST_MESSAGE);
-    res.send(user);
+    res.send({
+      name, about, avatar, email,
+    });
   } catch (err) {
     next(err);
   }
@@ -109,7 +111,7 @@ module.exports.login = async (req, res, next) => {
       httpOnly: true,
       sameSite: true,
     });
-    res.end();
+    res.send(user);
   } catch (err) {
     next(err);
   }

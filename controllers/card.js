@@ -34,7 +34,7 @@ module.exports.deleteCard = async (req, res, next) => {
       throw new ForbiddenError(FORBIDDEN_MESSAGE);
     }
     await Card.findByIdAndRemove(req.params.cardId);
-    res.end();
+    res.send(card);
   } catch (err) {
     next(err);
   }
