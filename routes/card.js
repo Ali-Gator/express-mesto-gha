@@ -13,7 +13,7 @@ router.post('/', celebrate({
 }), postCard);
 router.delete('/:cardId', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().required(),
+    cardId: Joi.string().alphanum().length(24).required(),
   }),
 }), deleteCard);
 router.put('/:cardId/likes', celebrate({
