@@ -4,17 +4,21 @@ const cardSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
-    minLength: [2, 'Too short length of name'],
-    maxLength: [30, 'Too long length of name'],
+    minLength: 2,
+    maxLength: 30,
   },
   link: {
     type: String,
-    required: [true, 'Link required'],
+    required: true,
+    validate: {
+      // eslint-disable-next-line no-useless-escape
+      validator: (v) => /^https?:\/\/[www\.]?[\dA-Za-z\-\._~:\/\?#\[\]@!\$&'\(\)\*\+,;=]+/gi.test(v),
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: [true, 'Owner required'],
+    required: true,
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,

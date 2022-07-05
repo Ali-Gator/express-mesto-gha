@@ -1,9 +1,21 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const { celebrate, Joi, errors } = require('celebrate');
+const {
+  DEFAULT_PORT,
+  NOT_FOUND_ERR,
+  NOT_FOUND_MESSAGE,
+  BAD_REQUEST_ERROR,
+  BAD_REQUEST_MESSAGE,
+  CONFLICT_MESSAGE,
+} = require('./utils/constants');
 const users = require('./routes/users');
+const { login, createUser } = require('./controllers/users');
 const cards = require('./routes/card');
-const { DEFAULT_PORT, NOT_FOUND_ERR, NOT_FOUND_MESSAGE } = require('./utils/constants');
+const auth = require('./middlewares/auth');
 
 const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
@@ -18,18 +30,59 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use((req, res, next) => {
-  req.user = {
-    _id: '62ae17b5b1124cdfe5ccdd39',
-  };
-  next();
-});
+app.use(cookieParser());
+
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    // eslint-disable-next-line no-useless-escape
+    avatar: Joi.string().pattern(/^https?:\/\/[www\.]?[\dA-Za-z\-\._~:\/\?#\[\]@!\$&'\(\)\*\+,;=]+/i),
+  }),
+}), createUser);
+
+app.use(auth);
 
 app.use('/users', users);
 app.use('/cards', cards);
 
 app.use((req, res) => {
   res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+});
+
+app.use(errors());
+
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  const {
+    statusCode = 500, message, name, code,
+  } = err;
+  if (code === 11000) {
+    return res.status(409).send({ message: CONFLICT_MESSAGE });
+  }
+
+  switch (name) {
+    case 'CastError':
+      res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
+      break;
+    case 'ValidationError':
+      res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
+      break;
+    default:
+      res.status(statusCode).send({
+        message: statusCode === 500
+          ? 'Server error'
+          : message,
+      });
+  }
 });
 
 app.listen(PORT, () => {

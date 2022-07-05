@@ -1,21 +1,18 @@
 const Card = require('../models/card');
-const {
-  BAD_REQUEST_ERROR,
-  BAD_REQUEST_MESSAGE,
-  INTERNAL_SERVER_ERROR,
-  INTERNAL_SERVER_MESSAGE, NOT_FOUND_ERR, NOT_FOUND_MESSAGE,
-} = require('../utils/constants');
+const { NOT_FOUND_MESSAGE, FORBIDDEN_MESSAGE } = require('../utils/constants');
+const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/forbidden');
 
-module.exports.getCards = async (req, res) => {
+module.exports.getCards = async (req, res, next) => {
   try {
     const cards = await Card.find({}).populate(['owner', 'likes']);
     res.send(cards);
   } catch (err) {
-    res.status(INTERNAL_SERVER_ERROR).send({ message: INTERNAL_SERVER_MESSAGE });
+    next(err);
   }
 };
 
-module.exports.postCard = async (req, res) => {
+module.exports.postCard = async (req, res, next) => {
   try {
     const { name, link } = req.body;
     const owner = req.user._id;
@@ -23,65 +20,50 @@ module.exports.postCard = async (req, res) => {
     const card = await Card.create({ name, link, owner });
     res.send(card);
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
-    }
-    res.status(INTERNAL_SERVER_ERROR).send({ message: INTERNAL_SERVER_MESSAGE });
+    next(err);
   }
 };
 
-module.exports.deleteCard = async (req, res) => {
+module.exports.deleteCard = async (req, res, next) => {
   try {
-    const card = await Card.findByIdAndRemove(req.params.cardId);
-    if (card) {
-      res.send({ message: 'Post successfully deleted' });
-    } else {
-      res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+    const card = await Card.findById(req.params.cardId).populate('owner');
+    if (!card) {
+      throw new NotFoundError(NOT_FOUND_MESSAGE);
     }
+    if (card.owner._id.toString() !== req.user._id) {
+      throw new ForbiddenError(FORBIDDEN_MESSAGE);
+    }
+    await Card.findByIdAndRemove(req.params.cardId);
+    res.send(card);
   } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
-    }
-    res.status(INTERNAL_SERVER_ERROR).send({ INTERNAL_SERVER_MESSAGE });
+    next(err);
   }
 };
 
-module.exports.putLike = async (req, res) => {
+module.exports.putLike = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true },
     ).populate(['owner', 'likes']);
-    if (card) {
-      res.send(card);
-    } else {
-      res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
-    }
+    if (!card) throw new NotFoundError(NOT_FOUND_MESSAGE);
+    res.send(card);
   } catch (err) {
-    if (err.name === 'CastError') {
-      return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
-    }
-    res.status(INTERNAL_SERVER_ERROR).send({ message: INTERNAL_SERVER_MESSAGE });
+    next(err);
   }
 };
 
-module.exports.deleteLike = async (req, res) => {
+module.exports.deleteLike = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } },
       { new: true },
     ).populate(['owner', 'likes']);
-    if (card) {
-      res.send(card);
-    } else {
-      res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
-    }
+    if (!card) throw new NotFoundError(NOT_FOUND_MESSAGE);
+    res.send(card);
   } catch (err) {
-    if (err.name === 'CastError') {
-      return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
-    }
-    res.status(INTERNAL_SERVER_ERROR).send({ message: INTERNAL_SERVER_MESSAGE });
+    next(err);
   }
 };
