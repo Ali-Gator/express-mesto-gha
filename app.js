@@ -52,8 +52,7 @@ app.use(auth);
 
 app.use('/users', users);
 app.use('/cards', cards);
-
-app.use((req, res) => {
+app.all('*', (req, res) => {
   res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
 });
 
