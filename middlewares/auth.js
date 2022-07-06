@@ -8,11 +8,14 @@ module.exports = (req, res, next) => {
   try {
     const token = req.cookies.jwt;
     if (!token) throw new UnauthorizedError(UNAUTHORIZED_MESSAGE);
-    req.user = jwt.verify(
+    jwt.verify(
       token,
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+      (err, decoded) => {
+        if (err) throw new UnauthorizedError(UNAUTHORIZED_MESSAGE);
+        req.user = decoded;
+      },
     );
-    if (!req.user) throw new UnauthorizedError(UNAUTHORIZED_MESSAGE);
     next();
   } catch (err) {
     next(err);

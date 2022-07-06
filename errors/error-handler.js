@@ -2,6 +2,7 @@ const { BAD_REQUEST_ERROR, BAD_REQUEST_MESSAGE, CONFLICT_MESSAGE } = require('..
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
+  console.log(err);
   const {
     statusCode = 500, message, name, code,
   } = err;
