@@ -1,31 +1,28 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-const { UNAUTHORIZED_MESSAGE } = require('../utils/constants');
+const { UNAUTHORIZED_MESSAGE, URL_REGEXP } = require('../utils/constants');
 const UnauthorizedError = require('../errors/unauthorized');
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     default: 'Жак-Ив Кусто',
-    required: true,
     minLength: 2,
     maxLength: 30,
   },
   about: {
     type: String,
     default: 'Исследователь',
-    required: true,
     minLength: 2,
     maxLength: 30,
   },
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-    required: true,
     validate: {
       // eslint-disable-next-line no-useless-escape
-      validator: (v) => /^https?:\/\/[www\.]?[\dA-Za-z\-\._~:\/\?#\[\]@!\$&'\(\)\*\+,;=]+/gi.test(v),
+      validator: (v) => URL_REGEXP.test(v),
     },
   },
   email: {

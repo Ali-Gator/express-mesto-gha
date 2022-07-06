@@ -3,12 +3,13 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getUsers, getUserById, patchProfile, patchAvatar, getCurrentUser,
 } = require('../controllers/users');
+const { URL_REGEXP } = require('../utils/constants');
 
 router.get('/', getUsers);
 router.get('/me', getCurrentUser);
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().alphanum().length(24).required(),
+    userId: Joi.string().hex().length(24).required(),
   }),
 }), getUserById);
 router.patch('/me', celebrate({
@@ -20,7 +21,7 @@ router.patch('/me', celebrate({
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     // eslint-disable-next-line no-useless-escape
-    avatar: Joi.string().pattern(/^https?:\/\/[www\.]?[\dA-Za-z\-\._~:\/\?#\[\]@!\$&'\(\)\*\+,;=]+/i).required(),
+    avatar: Joi.string().pattern(URL_REGEXP).required(),
   }),
 }), patchAvatar);
 

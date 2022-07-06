@@ -13,4 +13,6 @@ module.exports = {
   CONFLICT_MESSAGE: 'Email is already used',
   INTERNAL_SERVER_ERROR: 500,
   INTERNAL_SERVER_MESSAGE: 'Unknown error. Please check!',
+  // eslint-disable-next-line no-useless-escape
+  URL_REGEXP: /^https?:\/\/[www\.]?[\dA-Za-z\-\._~:\/\?#\[\]@!\$&'\(\)\*\+,;=]+/i,
 };

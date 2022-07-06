@@ -4,18 +4,13 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const { celebrate, Joi, errors } = require('celebrate');
-const {
-  DEFAULT_PORT,
-  NOT_FOUND_ERR,
-  NOT_FOUND_MESSAGE,
-  BAD_REQUEST_ERROR,
-  BAD_REQUEST_MESSAGE,
-  CONFLICT_MESSAGE,
-} = require('./utils/constants');
+const { DEFAULT_PORT, NOT_FOUND_MESSAGE, URL_REGEXP } = require('./utils/constants');
 const users = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
 const cards = require('./routes/card');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/not-found-err');
+const errorHandler = require('./errors/error-handler');
 
 const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
@@ -45,7 +40,7 @@ app.post('/signup', celebrate({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     // eslint-disable-next-line no-useless-escape
-    avatar: Joi.string().pattern(/^https?:\/\/[www\.]?[\dA-Za-z\-\._~:\/\?#\[\]@!\$&'\(\)\*\+,;=]+/i),
+    avatar: Joi.string().pattern(URL_REGEXP),
   }),
 }), createUser);
 
@@ -53,36 +48,16 @@ app.use(auth);
 
 app.use('/users', users);
 app.use('/cards', cards);
-app.all('*', (req, res) => {
-  res.status(NOT_FOUND_ERR).send({ message: NOT_FOUND_MESSAGE });
+app.all('*', (req, res, next) => {
+  try {
+    throw new NotFoundError(NOT_FOUND_MESSAGE);
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.use(errors());
-
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  const {
-    statusCode = 500, message, name, code,
-  } = err;
-  if (code === 11000) {
-    return res.status(409).send({ message: CONFLICT_MESSAGE });
-  }
-
-  switch (name) {
-    case 'CastError':
-      res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
-      break;
-    case 'ValidationError':
-      res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MESSAGE });
-      break;
-    default:
-      res.status(statusCode).send({
-        message: statusCode === 500
-          ? 'Server error'
-          : message,
-      });
-  }
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
 

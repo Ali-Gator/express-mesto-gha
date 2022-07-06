@@ -12,6 +12,7 @@ module.exports = (req, res, next) => {
       token,
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
     );
+    if (!req.user) throw new UnauthorizedError(UNAUTHORIZED_MESSAGE);
     next();
   } catch (err) {
     next(err);
