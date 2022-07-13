@@ -58,7 +58,7 @@ app.all('*', (req, res, next) => {
 
 app.use(errors());
 app.use(errorHandler);
-
+console.log('vse ok');
 app.listen(PORT, () => {
 
 });
