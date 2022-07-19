@@ -9,6 +9,7 @@ const users = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
 const cards = require('./routes/card');
 const auth = require('./middlewares/auth');
+const cors = require('./middlewares/cors');
 const NotFoundError = require('./errors/not-found-err');
 const errorHandler = require('./errors/error-handler');
 
@@ -26,6 +27,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+app.use(cors);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -58,7 +61,7 @@ app.all('*', (req, res, next) => {
 
 app.use(errors());
 app.use(errorHandler);
-console.log('vse ok');
+
 app.listen(PORT, () => {
 
 });

@@ -15,4 +15,8 @@ module.exports = {
   INTERNAL_SERVER_MESSAGE: 'Unknown error. Please check!',
   // eslint-disable-next-line no-useless-escape
   URL_REGEXP: /^https?:\/\/[www\.]?[\dA-Za-z\-\._~:\/\?#\[\]@!\$&'\(\)\*\+,;=]+/i,
+  ALLOWED_CORS: [
+    'localhost:3000',
+  ],
+  DEFAULT_ALLOWED_METHODS: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 };
