@@ -13,13 +13,13 @@ const any = require('./routes/any');
 const auth = require('./middlewares/auth');
 const cors = require('./middlewares/cors');
 const errorHandler = require('./errors/error-handler');
-const handleUncaughtException = require('./errors/uncaught-exception');
+// const handleUncaughtException = require('./errors/uncaught-exception');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
 
-process.on('uncaughtException', handleUncaughtException);
+// process.on('uncaughtException', handleUncaughtException);
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
