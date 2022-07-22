@@ -14,6 +14,7 @@ const auth = require('./middlewares/auth');
 const cors = require('./middlewares/cors');
 const errorHandler = require('./errors/error-handler');
 const handleUncaughtException = require('./errors/uncaught-exception');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
@@ -28,6 +29,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.use(requestLogger);
 app.use(cors);
 
 app.use('/signin', signin);
@@ -39,6 +41,7 @@ app.use('/users', users);
 app.use('/cards', cards);
 app.use('*', any);
 
+app.use(errorLogger);
 app.use(errors());
 app.use(errorHandler);
 
