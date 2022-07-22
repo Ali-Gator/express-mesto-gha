@@ -32,6 +32,13 @@ app.use(cookieParser());
 app.use(requestLogger);
 app.use(cors);
 
+// todo delete after test
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 app.use('/signin', signin);
 app.use('/signup', signup);
 
